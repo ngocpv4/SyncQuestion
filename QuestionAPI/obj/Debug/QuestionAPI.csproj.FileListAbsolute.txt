@@ -167,3 +167,5 @@ F:\wwww\SyncQuestion\QuestionAPI\obj\Debug\QuestionAPI.csproj.CoreCompileInputs.
 F:\wwww\SyncQuestion\QuestionAPI\obj\Debug\QuestionAPI.csproj.CopyComplete
 F:\wwww\SyncQuestion\QuestionAPI\obj\Debug\QuestionAPI.dll
 F:\wwww\SyncQuestion\QuestionAPI\obj\Debug\QuestionAPI.pdb
+F:\wwww\SyncQuestion\QuestionAPI\bin\Swashbuckle.Core.dll
+F:\wwww\SyncQuestion\QuestionAPI\bin\WebActivatorEx.dll

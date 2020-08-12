@@ -12,10 +12,12 @@ using System.Web.Http;
 
 namespace QuestionAPI.Controllers
 {
+    [RoutePrefix("api/SyncQuestion")]
     public class SyncQuestionController : ApiController
     {
         // GET: SyncQuestion
         [HttpGet]
+        [Route("GetListQuestion")]
         public async Task<HttpResponseMessage> GetListQuestion(int topnumber = 10, long? lastupdate = null)
         {
             string apiUrl = "http://haiduong.tetvietaic.com/api/service/questions";
@@ -31,7 +33,7 @@ namespace QuestionAPI.Controllers
                 var data = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    var results = JsonConvert.DeserializeObject<ResultSuccess<Question>>(data);
+                    var results = JsonConvert.DeserializeObject<ResultSuccess<QuestionListVM>>(data);
                     var questions = results;
                     if (lastupdate != null)
                     {
@@ -59,8 +61,9 @@ namespace QuestionAPI.Controllers
             }
         }
 
-        [HttpPost()]
-        public async Task<HttpResponseMessage> PostOrganization([FromBody]List<Organization> organization)
+        [HttpPost]
+        [Route("PostOrganization")]
+        public async Task<HttpResponseMessage> PostOrganization([FromBody]List<Organization> organizations)
         {
             string apiUrl = "http://haiduong.tetvietaic.com/api/service/question/organization/create";
 
@@ -72,9 +75,9 @@ namespace QuestionAPI.Controllers
                 client.DefaultRequestHeaders.Add("SERVERCRSAPIKEY", "f07e79e7-6176-4587-8020-a8e8113324dd");
                 string json = string.Empty;
 
-                if (organization != null)
+                if (organizations != null)
                 {
-                    json = JsonConvert.SerializeObject(organization);
+                    json = JsonConvert.SerializeObject(organizations);
                 }
                 else
                 {
@@ -102,6 +105,53 @@ namespace QuestionAPI.Controllers
                         message = results.error.message
                     });
                 }    
+            }
+        }
+
+        [HttpPost]
+        [Route("PostQuestion")]
+        public async Task<HttpResponseMessage> PostQuestion([FromBody]List<QuestionCreateRequestVM> questions)
+        {
+            string apiUrl = "http://haiduong.tetvietaic.com/api/service/question/create";
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(apiUrl);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Add("SERVERCRSAPIKEY", "f07e79e7-6176-4587-8020-a8e8113324dd");
+                string json = string.Empty;
+
+                if (questions != null)
+                {
+                    json = JsonConvert.SerializeObject(questions);
+                }
+                else
+                {
+                    json = JsonConvert.SerializeObject(new { });
+                }
+
+                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync(apiUrl, httpContent);
+                var data = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    var results = JsonConvert.DeserializeObject<ResultSuccess<QuestionCreateResponseVM>>(data);
+                    return Request.CreateResponse(HttpStatusCode.OK, new
+                    {
+                        code = 200,
+                        data = results.results.data
+                    });
+                }
+                else
+                {
+                    var results = JsonConvert.DeserializeObject<ResultError>(data);
+                    return Request.CreateResponse(HttpStatusCode.OK, new
+                    {
+                        code = results.error.code,
+                        message = results.error.message
+                    });
+                }
             }
         }
     }

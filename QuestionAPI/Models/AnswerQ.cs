@@ -10,5 +10,6 @@ namespace QuestionAPI.Models
         public int id { get; set; }
         public int organization_id { get; set; }
         public string answer { get; set; }
+        public long created_at { get; set; }
     }
 }
