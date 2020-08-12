@@ -5,8 +5,8 @@ using System.Web;
 
 namespace QuestionAPI.Models
 {
-    public class Result<T>
+    public class ResultError
     {
-        public PageResult<T> results { get; set; }
+        public Error error { get; set; }
     }
 }

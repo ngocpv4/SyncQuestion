@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 
 namespace QuestionAPI.Controllers
@@ -27,10 +28,10 @@ namespace QuestionAPI.Controllers
                 client.DefaultRequestHeaders.Add("SERVERCRSAPIKEY", "f07e79e7-6176-4587-8020-a8e8113324dd");
 
                 HttpResponseMessage response = await client.GetAsync(apiUrl);
+                var data = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    var data = await response.Content.ReadAsStringAsync();
-                    var results = JsonConvert.DeserializeObject<Result<Question>>(data);
+                    var results = JsonConvert.DeserializeObject<ResultSuccess<Question>>(data);
                     var questions = results;
                     if (lastupdate != null)
                     {
@@ -46,11 +47,16 @@ namespace QuestionAPI.Controllers
                         data = questions
                     });
                 }
+                else
+                {
+                    var results = JsonConvert.DeserializeObject<ResultError>(data);
+                    return Request.CreateResponse(HttpStatusCode.OK, new
+                    {
+                        code = results.error.code,
+                        message = results.error.message
+                    });
+                }    
             }
-            return Request.CreateResponse(HttpStatusCode.NotFound, new
-            {
-                code = 404
-            });
         }
 
         [HttpPost()]
@@ -64,23 +70,39 @@ namespace QuestionAPI.Controllers
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Add("SERVERCRSAPIKEY", "f07e79e7-6176-4587-8020-a8e8113324dd");
-                string json = JsonConvert.SerializeObject(organization);
-                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+                string json = string.Empty;
 
+                if (organization != null)
+                {
+                    json = JsonConvert.SerializeObject(organization);
+                }
+                else
+                {
+                    json = JsonConvert.SerializeObject(new {});
+                }
+                
+                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync(apiUrl, httpContent);
+                var data = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    var data = await response.Content.ReadAsStringAsync();
+                    var results = JsonConvert.DeserializeObject<ResultSuccess<Organization>>(data);
                     return Request.CreateResponse(HttpStatusCode.OK, new
                     {
-                        code = 200
+                        code = 200,
+                        data = results.results.data
                     });
                 }
+                else
+                {
+                    var results = JsonConvert.DeserializeObject<ResultError>(data);
+                    return Request.CreateResponse(HttpStatusCode.OK, new
+                    {
+                        code = results.error.code,
+                        message = results.error.message
+                    });
+                }    
             }
-            return Request.CreateResponse(HttpStatusCode.BadRequest, new
-            {
-                code = 400
-            });
         }
     }
 }
