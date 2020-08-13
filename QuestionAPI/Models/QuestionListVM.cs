@@ -10,7 +10,7 @@ namespace QuestionAPI.Models
         public long id { get; set; }
         public int? web_id { get; set; }
         public int status { get; set; }
-        public int organization_id { get; set; }
+        public int? organization_id { get; set; }
         public string full_name { get; set; }
         public string address { get; set; }
         public string card_id { get; set; }
