@@ -5,9 +5,9 @@ using System.Web;
 
 namespace QuestionAPI.Models
 {
-    public class Organization
+    public class OrganizationResponseVM
     {
-        public int id { get; set; }
+        public int web_id { get; set; }
         public string name { get; set; }
         public int status { get; set; }
     }

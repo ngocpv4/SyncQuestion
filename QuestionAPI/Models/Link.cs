@@ -7,7 +7,7 @@ namespace QuestionAPI.Models
 {
     public class Link
     {
-        public bool? next { get; set; }
+        public string next { get; set; }
         public bool? previous { get; set; }
     }
 }
